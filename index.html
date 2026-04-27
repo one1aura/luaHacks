@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LuaVault - Roblox Script Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --neon-green: #00ff41;
+      --neon-cyan: #00f5ff;
+      --neon-purple: #bf00ff;
+      --neon-pink: #ff006e;
+      --dark-bg: #010409;
+      --card-bg: #0d1117;
+      --card-border: #1a2332;
+      --text-primary: #e6edf3;
+      --text-muted: #7d8590;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Share Tech Mono', monospace;
+      background: var(--dark-bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Matrix Rain Canvas */
+    #matrix-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      opacity: 0.04;
+      pointer-events: none;
+    }
+
+    /* Scanline overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,65,0.01) 2px, rgba(0,255,65,0.01) 4px);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .content-wrapper { position: relative; z-index: 2; }
+
+    /* NAVBAR */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 64px;
+      background: rgba(13,17,23,0.95);
+      border-bottom: 1px solid var(--neon-green);
+      box-shadow: 0 0 20px rgba(0,255,65,0.2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--neon-green);
+      text-shadow: 0 0 20px var(--neon-green), 0 0 40px var(--neon-green);
+      letter-spacing: 3px;
+      cursor: pointer;
+    }
+
+    .nav-logo span { color: var(--neon-cyan); }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all 0.3s;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .nav-links a:hover {
+      color: var(--neon-green);
+      text-shadow: 0 0 10px var(--neon-green);
+      background: rgba(0,255,65,0.05);
+    }
+
+    .nav-discord {
+      background: linear-gradient(135deg, #5865F2, #7289da);
+      color: #fff !important;
+      padding: 6px 14px !important;
+      border-radius: 6px !important;
+      font-weight: bold;
+      box-shadow: 0 0 15px rgba(88,101,242,0.4);
+      transition: all 0.3s !important;
+    }
+
+    .nav-discord:hover {
+      box-shadow: 0 0 25px rgba(88,101,242,0.8) !important;
+      transform: translateY(-1px);
+      color: #fff !important;
+    }
+
+    .btn-upload-nav {
+      background: transparent;
+      border: 1px solid var(--neon-green);
+      color: var(--neon-green) !important;
+      padding: 6px 16px !important;
+      border-radius: 6px !important;
+      cursor: pointer;
+      transition: all 0.3s !important;
+      text-shadow: 0 0 8px var(--neon-green);
+    }
+
+    .btn-upload-nav:hover {
+      background: var(--neon-green) !important;
+      color: #000 !important;
+      box-shadow: 0 0 20px var(--neon-green) !important;
+      text-shadow: none !important;
+    }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 80px 2rem 60px;
+      position: relative;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(0,255,65,0.05);
+      border: 1px solid rgba(0,255,65,0.3);
+      color: var(--neon-green);
+      padding: 4px 16px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      animation: pulse-border 2s infinite;
+    }
+
+    @keyframes pulse-border {
+      0%, 100% { border-color: rgba(0,255,65,0.3); box-shadow: 0 0 10px rgba(0,255,65,0.1); }
+      50% { border-color: rgba(0,255,65,0.8); box-shadow: 0 0 20px rgba(0,255,65,0.3); }
+    }
+
+    .hero h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--neon-green), var(--neon-cyan), var(--neon-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      filter: drop-shadow(0 0 30px rgba(0,255,65,0.3));
+    }
+
+    .hero p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      max-width: 550px;
+      margin: 0 auto 2rem;
+      line-height: 1.7;
+    }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      margin-top: 2rem;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 15px var(--neon-cyan);
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* SEARCH + FILTER */
+    .search-section {
+      padding: 0 2rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .search-bar-wrap {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-bar-wrap input {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-primary);
+      padding: 14px 20px 14px 50px;
+      border-radius: 8px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+      outline: none;
+    }
+
+    .search-bar-wrap input:focus {
+      border-color: var(--neon-green);
+      box-shadow: 0 0 20px rgba(0,255,65,0.15);
+    }
+
+    .search-bar-wrap input::placeholder { color: var(--text-muted); }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--neon-green);
+      font-size: 1.1rem;
+    }
+
+    .filters {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-label {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-right: 0.5rem;
+    }
+
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      letter-spacing: 1px;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      border-color: var(--neon-green);
+      color: var(--neon-green);
+      background: rgba(0,255,65,0.06);
+      box-shadow: 0 0 12px rgba(0,255,65,0.15);
+    }
+
+    .filter-btn.key-filter.active {
+      border-color: var(--neon-pink);
+      color: var(--neon-pink);
+      background: rgba(255,0,110,0.06);
+      box-shadow: 0 0 12px rgba(255,0,110,0.15);
+    }
+
+    .filter-btn.universal-filter.active {
+      border-color: var(--neon-purple);
+      color: var(--neon-purple);
+      background: rgba(191,0,255,0.06);
+      box-shadow: 0 0 12px rgba(191,0,255,0.15);
+    }
+
+    /* SCRIPTS GRID */
+    .scripts-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem 4rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1rem;
+      color: var(--neon-green);
+      text-shadow: 0 0 10px var(--neon-green);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .section-title::before { content: '> '; }
+
+    .scripts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .script-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: all 0.3s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .script-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .script-card:hover {
+      border-color: rgba(0,255,65,0.4);
+      box-shadow: 0 0 30px rgba(0,255,65,0.1), 0 8px 30px rgba(0,0,0,0.5);
+      transform: translateY(-3px);
+    }
+
+    .script-card:hover::before { opacity: 1; }
+
+    .card-image {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.8) saturate(1.2);
+    }
+
+    .card-image-placeholder {
+      width: 100%;
+      height: 160px;
+      background: linear-gradient(135deg, #0d1117, #1a2332);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 2rem;
+    }
+
+    .card-body { padding: 1rem; }
+
+    .card-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+    }
+
+    .tag {
+      font-size: 0.65rem;
+      padding: 2px 8px;
+      border-radius: 3px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .tag-keyless {
+      background: rgba(0,255,65,0.1);
+      border: 1px solid rgba(0,255,65,0.4);
+      color: var(--neon-green);
+    }
+
+    .tag-key {
+      background: rgba(255,0,110,0.1);
+      border: 1px solid rgba(255,0,110,0.4);
+      color: var(--neon-pink);
+    }
+
+    .tag-universal {
+      background: rgba(191,0,255,0.1);
+      border: 1px solid rgba(191,0,255,0.4);
+      color: var(--neon-purple);
+    }
+
+    .tag-category {
+      background: rgba(0,245,255,0.08);
+      border: 1px solid rgba(0,245,255,0.3);
+      color: var(--neon-cyan);
+    }
+
+    .card-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.4rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-game {
+      font-size: 0.75rem;
+      color: var(--neon-cyan);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .card-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--card-border);
+    }
+
+    .card-author {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .card-author span { color: var(--neon-green); }
+
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-copy {
+      background: rgba(0,255,65,0.08);
+      border: 1px solid rgba(0,255,65,0.3);
+      color: var(--neon-green);
+      padding: 5px 12px;
+      border-radius: 5px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      letter-spacing: 1px;
+    }
+
+    .btn-copy:hover {
+      background: var(--neon-green);
+      color: #000;
+      box-shadow: 0 0 15px var(--neon-green);
+    }
+
+    /* MODAL - Upload */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: var(--card-bg);
+      border: 1px solid var(--neon-green);
+      border-radius: 12px;
+      width: 90%;
+      max-width: 640px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 0 60px rgba(0,255,65,0.2);
+      position: relative;
+    }
+
+    .modal::-webkit-scrollbar { width: 4px; }
+    .modal::-webkit-scrollbar-track { background: var(--dark-bg); }
+    .modal::-webkit-scrollbar-thumb { background: var(--neon-green); border-radius: 2px; }
+
+    .modal-header {
+      padding: 1.5rem 1.5rem 1rem;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1rem;
+      color: var(--neon-green);
+      text-shadow: 0 0 10px var(--neon-green);
+      letter-spacing: 2px;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover { color: var(--neon-pink); }
+
+    .modal-body { padding: 1.5rem; }
+
+    .form-group { margin-bottom: 1.2rem; }
+
+    .form-label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--neon-cyan);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-label .required { color: var(--neon-pink); margin-left: 3px; }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--card-border);
+      color: var(--text-primary);
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.88rem;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--neon-green);
+      box-shadow: 0 0 15px rgba(0,255,65,0.1);
+    }
+
+    .form-select { appearance: none; cursor: pointer; }
+    .form-select option { background: var(--card-bg); }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 100px;
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    /* Image Upload */
+    .image-upload-area {
+      border: 2px dashed var(--card-border);
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .image-upload-area:hover, .image-upload-area.dragging {
+      border-color: var(--neon-green);
+      background: rgba(0,255,65,0.03);
+    }
+
+    .image-upload-area input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .upload-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+
+    .upload-text {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    .upload-text strong { color: var(--neon-green); }
+
+    .image-preview {
+      display: none;
+      width: 100%;
+      border-radius: 6px;
+      margin-top: 0.75rem;
+      max-height: 200px;
+      object-fit: cover;
+      border: 1px solid var(--neon-green);
+    }
+
+    /* Key toggle */
+    .key-toggle-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .key-type-btn {
+      flex: 1;
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 8px;
+      border-radius: 6px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+    }
+
+    .key-type-btn.active-keyless {
+      border-color: var(--neon-green);
+      color: var(--neon-green);
+      background: rgba(0,255,65,0.08);
+    }
+
+    .key-type-btn.active-key {
+      border-color: var(--neon-pink);
+      color: var(--neon-pink);
+      background: rgba(255,0,110,0.08);
+    }
+
+    .key-type-btn.active-universal {
+      border-color: var(--neon-purple);
+      color: var(--neon-purple);
+      background: rgba(191,0,255,0.08);
+    }
+
+    .key-link-field { display: none; margin-top: 0.75rem; }
+    .key-link-field.visible { display: block; }
+
+    /* Script code area */
+    .script-code-area {
+      background: rgba(0,0,0,0.5);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--neon-green);
+      width: 100%;
+      min-height: 140px;
+      resize: vertical;
+      outline: none;
+      transition: all 0.3s;
+      line-height: 1.6;
+    }
+
+    .script-code-area:focus {
+      border-color: var(--neon-green);
+      box-shadow: 0 0 15px rgba(0,255,65,0.1);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, rgba(0,255,65,0.15), rgba(0,245,255,0.1));
+      border: 1px solid var(--neon-green);
+      color: var(--neon-green);
+      padding: 14px;
+      border-radius: 8px;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      margin-top: 0.5rem;
+    }
+
+    .btn-submit:hover {
+      background: var(--neon-green);
+      color: #000;
+      box-shadow: 0 0 30px var(--neon-green);
+    }
+
+    /* RULES MODAL */
+    .rules-modal {
+      max-width: 680px;
+    }
+
+    .rules-section {
+      margin-bottom: 1.25rem;
+    }
+
+    .rules-section-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.8rem;
+      color: var(--neon-cyan);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rules-list {
+      list-style: none;
+      padding-left: 0.5rem;
+    }
+
+    .rules-list li {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      padding: 4px 0 4px 14px;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .rules-list li::before {
+      content: '›';
+      position: absolute;
+      left: 0;
+      color: var(--neon-green);
+    }
+
+    .rules-important {
+      background: rgba(255,0,110,0.06);
+      border: 1px solid rgba(255,0,110,0.25);
+      border-radius: 6px;
+      padding: 1rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-top: 1rem;
+    }
+
+    .rules-important strong { color: var(--neon-pink); }
+
+    /* NOTIFICATION */
+    .notification {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--card-bg);
+      border: 1px solid var(--neon-green);
+      color: var(--neon-green);
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      box-shadow: 0 0 30px rgba(0,255,65,0.3);
+      z-index: 9999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+    }
+
+    footer a { color: var(--neon-green); text-decoration: none; }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+    .empty-state p { font-size: 0.85rem; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--dark-bg); }
+    ::-webkit-scrollbar-thumb { background: rgba(0,255,65,0.3); border-radius: 3px; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hero h1 { font-size: 2rem; }
+      .hero-stats { gap: 1.5rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .scripts-grid { grid-template-columns: 1fr; }
+    }
+
+    .glitch {
+      animation: glitch 3s infinite;
+    }
+
+    @keyframes glitch {
+      0%, 90%, 100% { text-shadow: 0 0 20px var(--neon-green), 0 0 40px var(--neon-green); }
+      91% { text-shadow: -2px 0 var(--neon-pink), 2px 0 var(--neon-cyan); }
+      92% { text-shadow: 2px 0 var(--neon-pink), -2px 0 var(--neon-cyan); }
+      93% { text-shadow: 0 0 20px var(--neon-green), 0 0 40px var(--neon-green); }
+    }
+
+    .cursor-blink::after {
+      content: '█';
+      animation: blink 1s infinite;
+      color: var(--neon-green);
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .no-results {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+<canvas id="matrix-canvas"></canvas>
+
+<div class="content-wrapper">
+
+  <!-- NAVBAR -->
+  <nav>
+    <div class="nav-logo glitch">LUA<span>VAULT</span></div>
+    <ul class="nav-links">
+      <li><a href="#" onclick="showSection('scripts')">Scripts</a></li>
+      <li><a href="#" onclick="openRules()">Rules</a></li>
+      <li><a href="https://discord.com/invite/S45kkeuZNz" target="_blank" class="nav-discord">⚡ Discord</a></li>
+      <li><a href="#" onclick="openUpload()" class="btn-upload-nav">+ Upload</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">🔴 LIVE — Roblox Script Hub</div>
+    <h1>LuaVault<br/><span style="font-size:0.55em">Script Repository</span></h1>
+    <p>The most advanced Lua script hub for Roblox exploits. Browse, upload, and execute scripts with ease.</p>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num" id="stat-scripts">0</div>
+        <div class="stat-label">Scripts</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">24/7</div>
+        <div class="stat-label">Online</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">FREE</div>
+        <div class="stat-label">Always</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEARCH + FILTERS -->
+  <section class="search-section">
+    <div class="search-bar-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="search-input" placeholder="Search scripts, games, authors..." oninput="filterScripts()"/>
+    </div>
+    <div class="filters">
+      <span class="filter-label">Filter:</span>
+      <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+      <button class="filter-btn" onclick="setFilter('keyless', this)">🟢 Keyless</button>
+      <button class="filter-btn key-filter" onclick="setFilter('key', this)">🔴 Key</button>
+      <button class="filter-btn universal-filter" onclick="setFilter('universal', this)">🟣 Universal</button>
+      <span class="filter-label" style="margin-left:1rem">Category:</span>
+      <button class="filter-btn" onclick="setCatFilter('Combat', this)">⚔️ Combat</button>
+      <button class="filter-btn" onclick="setCatFilter('Farm', this)">🌾 Farm</button>
+      <button class="filter-btn" onclick="setCatFilter('ESP', this)">👁️ ESP</button>
+      <button class="filter-btn" onclick="setCatFilter('GUI', this)">🖥️ GUI</button>
+      <button class="filter-btn" onclick="setCatFilter('Movement', this)">🏃 Movement</button>
+      <button class="filter-btn" onclick="setCatFilter('Hub', this)">📦 Script Hub</button>
+      <button class="filter-btn" onclick="setCatFilter('Other', this)">🔧 Other</button>
+    </div>
+  </section>
+
+  <!-- SCRIPTS GRID -->
+  <section class="scripts-section">
+    <div class="section-header">
+      <h2 class="section-title cursor-blink">Scripts</h2>
+      <span style="font-size:0.75rem; color:var(--text-muted)" id="script-count">Loading...</span>
+    </div>
+    <div class="scripts-grid" id="scripts-grid">
+      <div class="empty-state" style="grid-column:1/-1">
+        <div class="icon">📂</div>
+        <p>No scripts yet. Be the first to upload!</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>LuaVault © 2025 — For Educational Purposes Only &nbsp;|&nbsp;
+    <a href="https://discord.com/invite/S45kkeuZNz" target="_blank">Discord</a> &nbsp;|&nbsp;
+    <a href="#" onclick="openRules()">Rules</a>
+  </p>
+</footer>
+
+<!-- UPLOAD MODAL -->
+<div class="modal-overlay" id="upload-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">// UPLOAD SCRIPT</div>
+      <button class="modal-close" onclick="closeUpload()">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="upload-form" onsubmit="submitScript(event)">
+
+        <!-- Script Name -->
+        <div class="form-group">
+          <label class="form-label">Script Name <span class="required">*</span></label>
+          <input class="form-input" type="text" id="script-name" placeholder="e.g. Infinite Farm GUI" required/>
+        </div>
+
+        <!-- Game + Category -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Game <span class="required">*</span></label>
+            <input class="form-input" type="text" id="script-game" placeholder="e.g. Blox Fruits" required/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category <span class="required">*</span></label>
+            <select class="form-select" id="script-category" required>
+              <option value="">-- Select --</option>
+              <option value="Combat">⚔️ Combat</option>
+              <option value="Farm">🌾 Farm</option>
+              <option value="ESP">👁️ ESP</option>
+              <option value="GUI">🖥️ GUI</option>
+              <option value="Movement">🏃 Movement</option>
+              <option value="Hub">📦 Script Hub</option>
+              <option value="Other">🔧 Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Key Type -->
+        <div class="form-group">
+          <label class="form-label">Key Type <span class="required">*</span></label>
+          <div class="key-toggle-group">
+            <button type="button" class="key-type-btn active-keyless" id="btn-keyless" onclick="setKeyType('keyless')">🟢 Keyless</button>
+            <button type="button" class="key-type-btn" id="btn-key" onclick="setKeyType('key')">🔴 Key Required</button>
+            <button type="button" class="key-type-btn" id="btn-universal" onclick="setKeyType('universal')">🟣 Universal</button>
+          </div>
+          <div class="key-link-field" id="key-link-field">
+            <input class="form-input" type="url" id="key-link" placeholder="https://your-key-link.com"/>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label class="form-label">Description <span class="required">*</span></label>
+          <textarea class="form-textarea" id="script-desc" placeholder="Describe what the script does..." required></textarea>
+        </div>
+
+        <!-- Script Code -->
+        <div class="form-group">
+          <label class="form-label">Lua Script Code <span class="required">*</span></label>
+          <textarea class="script-code-area" id="script-code" placeholder="-- Paste your Lua script here&#10;loadstring(game:HttpGet('...'))()&#10;" required></textarea>
+        </div>
+
+        <!-- Author + Credit -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Your Name <span class="required">*</span></label>
+            <input class="form-input" type="text" id="script-author" placeholder="Username" required/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Original Creator (if repost)</label>
+            <input class="form-input" type="text" id="script-credit" placeholder="Credit original author"/>
+          </div>
+        </div>
+
+        <!-- Image Upload -->
+        <div class="form-group">
+          <label class="form-label">Script Image / Thumbnail <span class="required">*</span></label>
+          <div class="image-upload-area" id="image-drop-area">
+            <input type="file" id="script-image" accept="image/*" onchange="previewImage(event)" required/>
+            <div class="upload-icon">🖼️</div>
+            <div class="upload-text"><strong>Click or drag</strong> to upload image<br/><span style="font-size:0.7rem;color:var(--text-muted)">PNG, JPG, GIF — Max 5MB — Required</span></div>
+            <img class="image-preview" id="image-preview-el" src="" alt="Preview"/>
+          </div>
+        </div>
+
+        <input type="hidden" id="selected-key-type" value="keyless"/>
+
+        <button type="submit" class="btn-submit">⚡ UPLOAD SCRIPT</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- RULES MODAL -->
+<div class="modal-overlay" id="rules-modal">
+  <div class="modal rules-modal">
+    <div class="modal-header">
+      <div class="modal-title">// SITE RULES</div>
+      <button class="modal-close" onclick="closeRules()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="rules-section">
+        <div class="rules-section-title">📵 Spam & Fake Content</div>
+        <ul class="rules-list">
+          <li>No fake, duplicated, or useless scripts</li>
+          <li>No scripts used only to advertise games or Discords</li>
+          <li>No scripts that crash, ban, or do nothing</li>
+          <li>Credit the creator if reposting — no mass low-effort uploads</li>
+        </ul>
+      </div>
+
+      <div class="rules-section">
+        <div class="rules-section-title">🔞 NSFW / Inappropriate Content</div>
+        <ul class="rules-list">
+          <li>No NSFW scripts, images, sounds, or animations</li>
+          <li>No NSFW usernames, bios, or profile pictures</li>
+          <li>No gore or disturbing content</li>
+          <li>Absolutely no CP — instant ban and reported to authorities</li>
+        </ul>
+      </div>
+
+      <div class="rules-section">
+        <div class="rules-section-title">📋 Reposting & Credits</div>
+        <ul class="rules-list">
+          <li>You may repost scripts only if you credit the original creator</li>
+          <li>Don't claim other people's scripts as your own</li>
+          <li>Script hub owners: combine all scripts into one post with a loader</li>
+        </ul>
+      </div>
+
+      <div class="rules-section">
+        <div class="rules-section-title">🔑 Key Systems</div>
+        <ul class="rules-list">
+          <li>Toggle the key option and include the correct link if your script uses a key</li>
+          <li>Key links are not for advertising — no downloads, no off-site script links</li>
+          <li>If your key uses unique data (HWID, etc.), post the base URL only</li>
+        </ul>
+      </div>
+
+      <div class="rules-section">
+        <div class="rules-section-title">💰 Scamming</div>
+        <ul class="rules-list">
+          <li>No stealing money, items, or accounts</li>
+          <li>No selling scripts built from public/open-source code</li>
+          <li>No exit-scamming or chargebacks after deals</li>
+        </ul>
+      </div>
+
+      <div class="rules-section">
+        <div class="rules-section-title">☠️ Malicious Content</div>
+        <ul class="rules-list">
+          <li>No harmful scripts — viruses, cookie loggers, account/item stealers, etc.</li>
+          <li>If your script logs data (UserId, HWID, IP) you must clearly disclose it</li>
+        </ul>
+      </div>
+
+      <div class="rules-section">
+        <div class="rules-section-title">🚫 Harassment & Hate Speech</div>
+        <ul class="rules-list">
+          <li>No slurs, hate speech, or harassment</li>
+          <li>No doxxing or sharing private info without permission</li>
+        </ul>
+      </div>
+
+      <div class="rules-section">
+        <div class="rules-section-title">🤖 Botting & Automation</div>
+        <ul class="rules-list">
+          <li>No botting accounts or flooding with automated actions</li>
+          <li>No brute-forcing accounts or abusing APIs</li>
+          <li>Custom script browsers allowed for viewing only</li>
+        </ul>
+      </div>
+
+      <div class="rules-section">
+        <div class="rules-section-title">🔄 Ban Evasion</div>
+        <ul class="rules-list">
+          <li>No alt accounts to avoid bans — alts will also be banned</li>
+        </ul>
+      </div>
+
+      <div class="rules-important">
+        <strong>⚠️ IMPORTANT:</strong> Breaking rules may result in warnings, suspensions, or permanent bans.
+        Serious violations (malicious content, NSFW, scamming) = <strong>immediate permanent ban</strong>.
+        We reserve the right to ban users at our discretion to maintain a safe community.
+      </div>
+
+      <div style="margin-top:1.5rem; text-align:center">
+        <a href="https://discord.com/invite/S45kkeuZNz" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#5865F2,#7289da);color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;font-size:0.85rem;box-shadow:0 0 20px rgba(88,101,242,0.4);">
+          ⚡ Join our Discord
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notification" id="notification">
+  <span id="notification-icon">✅</span>
+  <span id="notification-msg">Script uploaded!</span>
+</div>
+
+<script>
+  // ─── MATRIX RAIN ────────────────────────────────────────────────
+  const canvas = document.getElementById('matrix-canvas');
+  const ctx = canvas.getContext('2d');
+  let cols, drops;
+
+  function initMatrix() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const fontSize = 14;
+    cols = Math.floor(canvas.width / fontSize);
+    drops = Array(cols).fill(1);
+  }
+
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(1,4,9,0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#00ff41';
+    ctx.font = '14px Share Tech Mono';
+    drops.forEach((y, i) => {
+      const char = String.fromCharCode(0x30A0 + Math.random() * 96);
+      ctx.fillText(char, i * 14, y * 14);
+      if (y * 14 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    });
+  }
+
+  initMatrix();
+  setInterval(drawMatrix, 50);
+  window.addEventListener('resize', initMatrix);
+
+  // ─── SCRIPTS DATA ────────────────────────────────────────────────
+  let scripts = JSON.parse(localStorage.getItem('luavault_scripts') || '[]');
+  let currentKeyFilter = 'all';
+  let currentCatFilter = '';
+
+  // ─── RENDER SCRIPTS ─────────────────────────────────────────────
+  function renderScripts(list) {
+    const grid = document.getElementById('scripts-grid');
+    document.getElementById('script-count').textContent = list.length + ' script' + (list.length !== 1 ? 's' : '') + ' found';
+    document.getElementById('stat-scripts').textContent = scripts.length;
+
+    if (list.length === 0) {
+      grid.innerHTML = '<div class="no-results">⌀ No scripts match your search.</div>';
+      return;
+    }
+
+    grid.innerHTML = list.map((s, i) => `
+      <div class="script-card" id="card-${i}">
+        ${s.image
+          ? `<img class="card-image" src="${s.image}" alt="${s.name}" onerror="this.style.display='none'"/>`
+          : `<div class="card-image-placeholder">🖼️</div>`}
+        <div class="card-body">
+          <div class="card-tags">
+            <span class="tag ${s.keyType === 'keyless' ? 'tag-keyless' : s.keyType === 'key' ? 'tag-key' : 'tag-universal'}">
+              ${s.keyType === 'keyless' ? '🟢 Keyless' : s.keyType === 'key' ? '🔴 Key' : '🟣 Universal'}
+            </span>
+            <span class="tag tag-category">${s.category}</span>
+          </div>
+          <div class="card-title">${escHtml(s.name)}</div>
+          <div class="card-game">🎮 ${escHtml(s.game)}</div>
+          <div class="card-desc">${escHtml(s.desc)}</div>
+          <div class="card-footer">
+            <div class="card-author">
+              by <span>${escHtml(s.author)}</span>
+              ${s.credit ? `<br/><span style="color:var(--text-muted)">credit: ${escHtml(s.credit)}</span>` : ''}
+            </div>
+            <div class="card-actions">
+              ${s.keyLink ? `<a href="${s.keyLink}" target="_blank" class="btn-copy" style="text-decoration:none">🔑 Key</a>` : ''}
+              <button class="btn-copy" onclick="copyScript(${scripts.indexOf(s)}, event)">📋 Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function escHtml(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function filterScripts() {
+    const query = document.getElementById('search-input').value.toLowerCase();
+    let filtered = scripts;
+    if (currentKeyFilter !== 'all') filtered = filtered.filter(s => s.keyType === currentKeyFilter);
+    if (currentCatFilter) filtered = filtered.filter(s => s.category === currentCatFilter);
+    if (query) filtered = filtered.filter(s =>
+      s.name.toLowerCase().includes(query) ||
+      s.game.toLowerCase().includes(query) ||
+      s.author.toLowerCase().includes(query) ||
+      s.desc.toLowerCase().includes(query)
+    );
+    renderScripts(filtered);
+  }
+
+  function setFilter(type, btn) {
+    currentKeyFilter = type;
+    document.querySelectorAll('.filters .filter-btn').forEach(b => {
+      if (['all','keyless','key','universal'].includes(b.textContent.replace(/[^a-z]/gi,'').toLowerCase().trim()) ||
+          b.getAttribute('onclick')?.includes('setFilter')) {
+        b.classList.remove('active');
+      }
+    });
+    btn.classList.add('active');
+    filterScripts();
+  }
+
+  function setCatFilter(cat, btn) {
+    if (currentCatFilter === cat) {
+      currentCatFilter = '';
+      btn.classList.remove('active');
+    } else {
+      currentCatFilter = cat;
+      document.querySelectorAll('.filters .filter-btn').forEach(b => {
+        if (b.getAttribute('onclick')?.includes('setCatFilter')) b.classList.remove('active');
+      });
+      btn.classList.add('active');
+    }
+    filterScripts();
+  }
+
+  // ─── COPY SCRIPT ─────────────────────────────────────────────────
+  function copyScript(idx, e) {
+    e.stopPropagation();
+    const s = scripts[idx];
+    if (!s) return;
+    navigator.clipboard.writeText(s.code).then(() => {
+      showNotification('✅', 'Script copied to clipboard!');
+    }).catch(() => {
+      showNotification('❌', 'Failed to copy. Try manually.');
+    });
+  }
+
+  // ─── UPLOAD MODAL ────────────────────────────────────────────────
+  function openUpload() {
+    document.getElementById('upload-modal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeUpload() {
+    document.getElementById('upload-modal').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  // ─── RULES MODAL ─────────────────────────────────────────────────
+  function openRules() {
+    document.getElementById('rules-modal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeRules() {
+    document.getElementById('rules-modal').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  // Close modals on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    });
+  });
+
+  // ─── KEY TYPE TOGGLE ────────────────────────────────────────────
+  let selectedKeyType = 'keyless';
+
+  function setKeyType(type) {
+    selectedKeyType = type;
+    document.getElementById('selected-key-type').value = type;
+    ['keyless','key','universal'].forEach(t => {
+      const btn = document.getElementById('btn-' + t);
+      btn.className = 'key-type-btn';
+      if (t === type) btn.classList.add('active-' + t);
+    });
+    const keyField = document.getElementById('key-link-field');
+    if (type === 'key') {
+      keyField.classList.add('visible');
+      document.getElementById('key-link').required = true;
+    } else {
+      keyField.classList.remove('visible');
+      document.getElementById('key-link').required = false;
+    }
+  }
+
+  // ─── IMAGE PREVIEW ───────────────────────────────────────────────
+  function previewImage(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      showNotification('❌', 'Image too large. Max 5MB.');
+      event.target.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => {
+      const preview = document.getElementById('image-preview-el');
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+      document.querySelector('.upload-icon').style.display = 'none';
+      document.querySelector('.upload-text').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Drag & Drop
+  const dropArea = document.getElementById('image-drop-area');
+  ['dragenter','dragover'].forEach(e => dropArea.addEventListener(e, ev => { ev.preventDefault(); dropArea.classList.add('dragging'); }));
+  ['dragleave','drop'].forEach(e => dropArea.addEventListener(e, ev => { ev.preventDefault(); dropArea.classList.remove('dragging'); }));
+  dropArea.addEventListener('drop', ev => {
+    const files = ev.dataTransfer.files;
+    if (files[0]) {
+      document.getElementById('script-image').files = files;
+      previewImage({ target: { files } });
+    }
+  });
+
+  // ─── SUBMIT SCRIPT ───────────────────────────────────────────────
+  function submitScript(e) {
+    e.preventDefault();
+
+    const imageFile = document.getElementById('script-image').files[0];
+    if (!imageFile) {
+      showNotification('❌', 'Image is required!');
+      return;
+    }
+
+    const name = document.getElementById('script-name').value.trim();
+    const game = document.getElementById('script-game').value.trim();
+    const category = document.getElementById('script-category').value;
+    const desc = document.getElementById('script-desc').value.trim();
+    const code = document.getElementById('script-code').value.trim();
+    const author = document.getElementById('script-author').value.trim();
+    const credit = document.getElementById('script-credit').value.trim();
+    const keyLink = document.getElementById('key-link').value.trim();
+
+    if (!name || !game || !category || !desc || !code || !author) {
+      showNotification('❌', 'Please fill all required fields.');
+      return;
+    }
+
+    if (selectedKeyType === 'key' && !keyLink) {
+      showNotification('❌', 'Key link is required for key scripts.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const script = {
+        name, game, category, desc, code,
+        author, credit, keyType: selectedKeyType,
+        keyLink: selectedKeyType === 'key' ? keyLink : '',
+        image: ev.target.result,
+        date: new Date().toISOString()
+      };
+
+      scripts.unshift(script);
+      localStorage.setItem('luavault_scripts', JSON.stringify(scripts));
+      closeUpload();
+      document.getElementById('upload-form').reset();
+      document.getElementById('image-preview-el').style.display = 'none';
+      document.querySelector('.upload-icon').style.display = 'block';
+      document.querySelector('.upload-text').style.display = 'block';
+      setKeyType('keyless');
+      filterScripts();
+      showNotification('✅', 'Script uploaded successfully!');
+    };
+    reader.readAsDataURL(imageFile);
+  }
+
+  // ─── NOTIFICATION ────────────────────────────────────────────────
+  function showNotification(icon, msg) {
+    const el = document.getElementById('notification');
+    document.getElementById('notification-icon').textContent = icon;
+    document.getElementById('notification-msg').textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3000);
+  }
+
+  // ─── INIT ────────────────────────────────────────────────────────
+  renderScripts(scripts);
+</script>
+</body>
+</html>
