@@ -12,3 +12,17 @@
     "thumbnail": "assets/default.png"
   }
 ]
+[
+  {
+    "id": "1",
+    "title": "Enemy Nuker",
+    "game": "Any",
+    "category": "FARM",
+    "key": "KEY",
+    "description": "⚡ Get +1 Skill Point Every Second.",
+    "author": "GROX",
+    "credit": "Rob666",
+    "code": "print('Enemy Nuker Loaded')",
+    "thumbnail": "assets/default.png"
+  }
+]
