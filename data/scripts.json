@@ -1,0 +1,14 @@
+[
+  {
+    "id": "1",
+    "title": "Example Script",
+    "game": "Any",
+    "category": "HUB",
+    "key": "KEYLESS",
+    "description": "This is a sample script entry.",
+    "author": "Scripts",
+    "credit": "Scripts",
+    "code": "print('Hello from LuaVault')",
+    "thumbnail": "assets/default.png"
+  }
+]
