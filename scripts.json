@@ -1,9 +1,14 @@
-let scripts = [];
-
-fetch("https://one1aura.github.io/luaHacks/data/scripts.json")
-  .then(res => res.json())
-  .then(data => {
-      scripts = data;
-      renderScripts(scripts);
-  })
-  .catch(err => console.error("Failed to load scripts.json", err));
+[
+  {
+    "id": "1",
+    "title": "Example Script",
+    "game": "Any",
+    "category": "HUB",
+    "key": "KEYLESS",
+    "description": "This is a sample script entry.",
+    "author": "Scripts",
+    "credit": "Scripts",
+    "code": "print('Hello from LuaVault')",
+    "thumbnail": "assets/default.png"
+  }
+]
