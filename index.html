@@ -1191,7 +1191,15 @@
   window.addEventListener('resize', initMatrix);
 
   // ─── SCRIPTS DATA ────────────────────────────────────────────────
-  let scripts = JSON.parse(localStorage.getItem('luavault_scripts') || '[]');
+let scripts = [];
+
+fetch("https://one1aura.github.io/luaHacks/data/scripts.json")
+  .then(res => res.json())
+  .then(data => {
+      scripts = data;
+      renderScripts(scripts);
+  })
+  .catch(err => console.error("Failed to load scripts.json", err));
   let currentKeyFilter = 'all';
   let currentCatFilter = '';
 
