@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber-Synth Script Uploader</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>// CYBER-SYNTH TERMINAL //</h1>
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <span class="terminal-title">UPLOAD_SCRIPT.sh</span>
+                <div class="terminal-buttons">
+                    <span class="terminal-button close"></span>
+                    <span class="terminal-button minimize"></span>
+                    <span class="terminal-button maximize"></span>
+                </div>
+            </div>
+            <div class="terminal-body">
+                <div class="prompt">
+                    <span class="user">root@cybersynth</span>:<span class="path">/scripts</span>$ <input type="file" id="scriptUpload" accept=".js, .py, .sh, .txt">
+                </div>
+                <pre id="scriptContent" class="output"></pre>
+                <div class="status-line">
+                    STATUS: <span id="uploadStatus">Awaiting script upload...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
