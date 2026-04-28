@@ -1,0 +1,90 @@
+[
+  {
+    "id": "u1",
+    "username": "DevX",
+    "bio": "Elite Roblox scripter specializing in automation and farming tools. Building the future of Lua exploits.",
+    "joinDate": "2024-06-15",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=DevX",
+    "role": "Admin"
+  },
+  {
+    "id": "u2",
+    "username": "AimMaster",
+    "bio": "Combat script specialist. Silent aim, ESP, and wallhacks are my domain.",
+    "joinDate": "2024-07-22",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=AimMaster",
+    "role": "Scripter"
+  },
+  {
+    "id": "u3",
+    "username": "Visor",
+    "bio": "Universal tool creator. If it works on any game, I probably made it.",
+    "joinDate": "2024-08-01",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Visor",
+    "role": "Scripter"
+  },
+  {
+    "id": "u4",
+    "username": "HeistPro",
+    "bio": "Jailbreak and heist game expert. Auto-robbery scripts since day one.",
+    "joinDate": "2024-09-10",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=HeistPro",
+    "role": "Contributor"
+  },
+  {
+    "id": "u5",
+    "username": "Mover",
+    "bio": "Movement and physics hacker. Speed, fly, noclip — all day every day.",
+    "joinDate": "2024-10-05",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Mover",
+    "role": "Contributor"
+  },
+  {
+    "id": "u6",
+    "username": "Grinder",
+    "bio": "Dungeon and RPG auto-farmer. Max levels with zero effort.",
+    "joinDate": "2024-11-12",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Grinder",
+    "role": "Scripter"
+  },
+  {
+    "id": "u7",
+    "username": "PetMaster",
+    "bio": "Adopt Me and pet sim specialist. Bucks and pets on autopilot.",
+    "joinDate": "2024-12-01",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=PetMaster",
+    "role": "Contributor"
+  },
+  {
+    "id": "u8",
+    "username": "NinjaCoder",
+    "bio": "Anime game scripter. Shindo Life, King Legacy, Project Slayers — all automated.",
+    "joinDate": "2025-01-03",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=NinjaCoder",
+    "role": "Scripter"
+  },
+  {
+    "id": "u9",
+    "username": "GUIGod",
+    "bio": "GUI designer and full-stack scripter. Clean interfaces, powerful backends.",
+    "joinDate": "2025-01-08",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=GUIGod",
+    "role": "Admin"
+  },
+  {
+    "id": "u10",
+    "username": "PirateKing",
+    "bio": "Sea beast hunter and maritime automation expert.",
+    "joinDate": "2025-01-12",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=PirateKing",
+    "role": "Contributor"
+  },
+  {
+    "id": "u11",
+    "username": "TermMaster",
+    "bio": "Terminal automation wizard. CLI tools and command-line scripts for every game.",
+    "joinDate": "2025-02-01",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=TermMaster",
+    "role": "Scripter"
+  }
+]
