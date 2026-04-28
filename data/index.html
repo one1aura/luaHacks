@@ -3,58 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lua Scripting for Roblox Exploits</title>
+    <title>Cyber-Synth Script Uploader</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1>Mastering Lua Scripting for Roblox Exploits</h1>
-        <p>Unlock the potential of Roblox exploitation through advanced Lua scripting.</p>
-    </header>
-
-    <main>
-        <section class="intro">
-            <h2>Welcome to the World of Roblox Exploitation</h2>
-            <p>This site is dedicated to teaching you the fundamentals and advanced techniques of Lua scripting as applied to Roblox exploits. Whether you're looking to create custom scripts, understand game mechanics, or enhance your exploitation skills, you've come to the right place.</p>
-            <p><strong>Disclaimer:</strong> This content is for educational purposes only. Misuse of information for unauthorized activities is strictly discouraged and may lead to consequences.</p>
-        </section>
-
-        <section class="what-is-lua">
-            <h2>What is Lua?</h2>
-            <p>Lua is a powerful, efficient, lightweight, embeddable scripting language. It supports multiple programming paradigms, including procedural, object-oriented, and functional programming. Its simplicity and speed make it an ideal choice for game development and scripting, especially within environments like Roblox.</p>
-        </section>
-
-        <section class="roblox-exploits">
-            <h2>Lua in Roblox Exploits</h2>
-            <p>In the context of Roblox exploits, Lua is used to interact with and manipulate the Roblox game client. This can involve:</p>
-            <ul>
-                <li>Injecting custom scripts to modify game behavior.</li>
-                <li>Bypassing client-side checks.</li>
-                <li>Creating automated actions (bots).</li>
-                <li>Developing user interfaces (GUIs) for exploits.</li>
-            </ul>
-            <p>Understanding the Roblox API and how exploits interact with it is crucial for effective scripting.</p>
-        </section>
-
-        <section class="get-started">
-            <h2>Getting Started with Scripting</h2>
-            <p>To begin your journey, you'll need a basic understanding of Lua syntax. We'll cover topics such as:</p>
-            <ul>
-                <li>Variables and Data Types</li>
-                <li>Conditional Statements (if/else)</li>
-                <li>Loops (for, while, repeat)</li>
-                <li>Functions</li>
-                <li>Tables (Lua's equivalent of arrays/objects)</li>
-                <li>Event Handling</li>
-            </ul>
-            <p>Stay tuned for tutorials and code examples!</p>
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; 2023 CodeBulb Builder. All rights reserved.</p>
-    </footer>
-
+    <div class="container">
+        <h1>// CYBER-SYNTH TERMINAL //</h1>
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <span class="terminal-title">UPLOAD_SCRIPT.sh</span>
+                <div class="terminal-buttons">
+                    <span class="terminal-button close"></span>
+                    <span class="terminal-button minimize"></span>
+                    <span class="terminal-button maximize"></span>
+                </div>
+            </div>
+            <div class="terminal-body">
+                <div class="prompt">
+                    <span class="user">root@cybersynth</span>:<span class="path">/scripts</span>$ <input type="file" id="scriptUpload" accept=".js, .py, .sh, .txt">
+                </div>
+                <pre id="scriptContent" class="output"></pre>
+                <div class="status-line">
+                    STATUS: <span id="uploadStatus">Awaiting script upload...</span>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
